@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>Tagging Application</title>
+    <meta name="generator" content="Bootply"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link href="css/styles.css" rel="stylesheet">
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //alert("I am here");
+            //updateSeats();
+            showSeats();
+            function showSeats() {
+                $.ajax({
+                    type: "GET",
+                    dataType: "JSONP",
+                    url: "http://10.129.149.7:7000/getSeats",
+                    //data:'seatNum':TemperatureValue,
+                    success: function (data) {
+                        //alert("I am here");
+                        //console.log(data);
+                        var info = data.split(",");
+                        console.log(info);
+                        for (var i = 0; i < info.length - 1; i++) {
+                            var seatTemp = info[i].split(":");
+                            var obj = $('button[type=button][value=' + seatTemp[0] + ']') // get the dom  element
+                            if (obj != null) {
+                                var temp = parseFloat(seatTemp[1]);
+                                if (temp > 27.0)
+                                    obj.css('background-color','#f90100');
+                                else if (temp > 26.5 && temp <= 27)
+                                    obj.css('background-color','#fa7700');
+                                else if (temp > 26.0 && temp <= 26.5)
+                                    obj.css('background-color','#fbbc00');
+                                else if (temp > 25.5 && temp <= 26.0)
+                                    obj.css('background-color','#f5d000');
+                                else if (temp > 25.0 && temp <= 25.5)
+                                    obj.css('background-color','#e9e100');
+                                else if (temp > 24.2 && temp <= 25.0)
+                                    obj.css('background-color','#c3fe01');
+                                else if (temp >= 23.1 && temp <= 24.2)
+                                    obj.css('background-color','#41fe00');
+                                else if (temp > 22 && temp < 23.1)
+                                    obj.css('background-color','#41feab');
+                                else if (temp > 21 && temp <= 22)
+                                    obj.css('background-color','#41fec4');
+                                else
+                                    obj.css('background-color','#41fec4');
+                            }
+                        }
+                        ;
+                        //sleep(30000);
+
+                    }
+                });
+            }
+
+            /*function updateSeats() {
+                $.ajax({
+                    type: "GET",
+                    dataType: "JSONP",
+                    url: "http://10.129.149.7:7000/updateSeats",
+                    //data:'seatNum':TemperatureValue,
+                    success: function (data) {
+                        console.log(data);
+                    }
+                });
+            }
+            */
+
+/*
+            function getData(tag){
+            $.ajax({
+                    type: "GET",
+                    dataType: "JSONP",
+                    url: "http://10.129.149.7:7000/getData",
+                    //data:'seatNum':TemperatureValue,
+                    success: function (data) {
+                        console.log(data);
+                    }
+                });
+            }*/
+
+
+		
+
+            for(i = 1; i <=128 ; i++ )
+		    {
+                var btn_id = "#tag_btn"+ i;
+                console.log(btn_id);
+                $(btn_id).click(function()
+                {
+                    console.log(this.value);
+                    tag = this.value;
+                    //info=getData(tag);
+                    var modalId="#myModal"+tag;
+                    
+                    $(modalId).modal();
+
+                });
+		    }
+
+
+            
+            setInterval(function(){showSeats()}, 30000);
+            //setInterval(function () {
+             //   updateSeats()
+            //}, 80000);
+        });
+
+	var frm = $('#contactForm1');
+        var info;
+        frm.submit(function (e) {
+		e.preventDefault();
+
+		$.ajax({
+		    type: frm.attr('method'),
+		    url: frm.attr('action'),
+		    data: frm.serialize(),
+		    success: function (data) {
+		        console.log('Submission was successful.');
+		        console.log(data);
+		    },
+		    error: function (data) {
+		        console.log('An error occurred.');
+		        console.log(data);
+		    },
+		});
+	    });
+
+
+        function generateSeats(offset, count) {
+            var seat = "";
+            var modall = "";
+            var i = offset;
+            while (count--) {
+                seat += "<button type=\"button\" class=\"btn btn-default btn-xs\" value=\"" + i + "\" id=\"tag_btn" + i + "\" >" + i + "</button>\n";
+                modal_="<div class=\"modal fade\" id=\"myModal" + i + "\" role=\"dialog\"> <div class=\"modal-dialog\">";
+                modal_+="<div class=\"modal-content\"> <div class=\"modal-header\">";
+                modal_+="<button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>";
+                modal_+="<h4 class=\"modal-title\">User Feedback</h4> </div>";
+                modal_+="<div class=\"modal-body\" id=\"modalTemp" + i + " \" >" + "<form id=\"contactForm1\" action=\"http://10.129.149.7:7000/storeFeedback\" method=\"post\">"+"<div class=\"row\" >  <label class=\"btn btn-primary btn-s veryCold\"> <input type=\"radio\" name=\"options\" id=\"option1\" value=\"-3,"+i+"\"> <span class=\"glyphicon\">very cold</span> </label> <label class=\"btn btn-primary btn-s cold\"> <input type=\"radio\" name=\"options\" id=\"option2\" value=\"-2,"+i+"\"> <span class=\"glyphicon\">cold</span> </label> <label class=\"btn btn-primary btn-s slightlyCold\"> <input type=\"radio\" name=\"options\" id=\"option3\" value=\"-1,"+i+"\"> <span class=\"glyphicon\">slightly cold</span> </label> </div> <div class=\"row\" class=\"text-center\" >  <label class=\"btn btn-success btn-s neutral\"> <input type=\"radio\" name=\"options\" id=\"option4\" value=\"0,"+i+"\"> <span class=\"glyphicon\">neutral</span> </label> </div> <div class=\"row\"> <label class=\"btn btn-primary btn-s slightlyWarm\"> <input type=\"radio\" name=\"options\" id=\"option5\" value=\"1,"+i+"\"> <span class=\"glyphicon\">slightly warm</span> </label> <label class=\"btn btn-warning btn-s warm \"> <input type=\"radio\" name=\"options\" id=\"option6\" value=\"2,"+i+"\"> <span class=\"glyphicon\">warm</span> </label>  <label class=\"btn btn-danger btn-s hot\"> <input type=\"radio\" name=\"options\" id=\"option7\" value=\"3,"+i+"\"> <span class=\"glyphicon\">hot</span>  </label>  </div>   <input type=\"submit\" value=\"Submit\"> </form>"+"</div>";
+                modal_+="<div class=\"modal-footer\"> <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button>";
+                modal_+="</div></div></div></div>";
+                document.writeln(modal_);
+                i++;
+
+            }
+            document.writeln(seat);
+        }
+
+
+    </script>
+    <style>
+        button {
+            height: 30px;
+	    background-color: #f90100;
+        }
+
+        .row {
+            margin: 20px;
+        }
+
+        .seat {
+            height: 40px;
+            width: 30px;
+        }
+
+	
+        .veryCold {
+            background-color: #5ba5cd;
+            color: #000000;
+        }
+
+        .cold {
+            background-color: #8dc3de;
+            color: #000000;
+        }
+
+        .slightlyCold {
+            color: #000000;
+            background-color: #bcd9e5;
+        }
+
+        .neutral {
+            color: #000000;
+            background-color: #bfbfbf;
+        }
+
+        .slightlyWarm {
+            color: #000000;
+            background-color: #ceb3ae;
+        }
+
+        .warm {
+            color: #000000;
+            background-color: #b37e75;
+        }
+
+        .hot {
+            background-color: #8f3f32;
+            color: #000000;
+        }
+	img {
+		width:50%;
+		max-width:20%;
+		height:50%;
+	}
+
+
+
+    </style>
+</head>
+
+<body >
+<div class="navbar navbar-default">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">Seating Arrangement</a></li>
+            </ul>
+
+        </div><!--/.nav-collapse -->
+    </div>
+</div>
+
+<div class="container" style="width: 1500px;">
+    <div class="row">
+        <center>
+            <button type="button" class="btn btn-default btn-s" style="background-color: rgb(172, 0, 0);color: white" value="AC1" id="AC1">
+                AC1
+            </button>
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+            <button type="button" class="btn btn-default btn-s" style="background-color: rgb(172, 0, 0);color: white" value="AC3" id="AC3">
+                AC3
+            </button>
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+            <button type="button" class="btn btn-default btn-s" style="background-color: rgb(172, 0, 0);color: white" value="AC5" id="AC5">
+                AC5
+            </button>
+        </center>
+    </div>
+    <div class="row">
+        <center>
+            <script>
+                generateSeats(1, 11);
+            </script>
+            <button type="button" class="btn btn-default btn-xs"></button>
+            <button type="button" class="btn btn-default btn-xs"></button>
+            <script>
+                generateSeats(12, 8);
+            </script>
+        </center>
+    </div>
+
+    <div class="row">
+        <center>
+            <script>
+                generateSeats(20, 14);
+            </script>
+            <button type="button" class="btn btn-default btn-xs"></button>
+            <button type="button" class="btn btn-default btn-xs"></button>
+            <script>
+                generateSeats(34, 11);
+            </script>
+            &emsp;&emsp;&emsp;&emsp;
+        </center>
+    </div>
+
+    <div class="row">
+        <center>
+            <script>
+                generateSeats(45, 16);
+            </script>
+            <button type="button" class="btn btn-default btn-xs"></button>
+            <button type="button" class="btn btn-default btn-xs"></button>
+            <script>
+                generateSeats(61, 14);
+            </script>
+            &emsp;&emsp;
+        </center>
+    </div>
+
+    <div class="row">
+        <center>
+            <script>
+                generateSeats(75, 19);
+            </script>
+            <button type="button" class="btn btn-default btn-xs"></button>
+            <button type="button" class="btn btn-default btn-xs"></button>
+            <script>
+                generateSeats(94, 16);
+            </script>
+        </center>
+    </div>
+
+    <div class="row">
+        <center>
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+            <script>
+                generateSeats(110, 19);
+            </script>
+
+        </center>
+    </div>
+
+
+    <div class="row">
+       &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+            <button type="button" class="btn btn-default btn-s" style="background-color: rgb(172, 0, 0);color: white" value="AC7" id="AC4">
+                AC7
+            </button>
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+            &emsp;&emsp;&emsp;&emsp;&emsp;
+            <button type="button" class="btn btn-default btn-s" style="background-color: rgb(172, 0, 0);color: white" value="AC6" id="AC5">
+                AC6
+            </button>
+    </div>
+<div class="row">
+<center>
+<img scale=0.5 src="colorBar.png">
+</center>
+</div>
+
+</div><!-- /.container -->
+<!-- script references -->
+
+
+</body>
+</html>
